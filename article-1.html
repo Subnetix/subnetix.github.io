@@ -41,7 +41,7 @@ _start:
 	push rsi <-- push rsi on the stack
 	mov rdx, "//bin/sh" <-- put //bin/sh into rdx register
 	push rdx <-- push rdx register on the stack
-	xor rdx, rdx <-- set rsi to 0
+	xor rdx, rdx <-- set rdx to 0
 	mov rdi, rsp <-- set pointer
 	syscall <-- call kernel
 		</xmp>
@@ -53,7 +53,7 @@ _start:
 		<p>./shell</p>
 		<p>$ </p>
 	</code>
-	<h4>Fine it work !</h4>
+	<h4>Fine it works !</h4>
 	<h4>So now let's build shellcode !</h4>
 	<code>
 		<p>--> objdump -d ./shell|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'</p>
@@ -84,7 +84,7 @@ Shellcode lenght : 26
 $
 		</xmp>
 	</code>
-	<h4>It work !</h4>
+	<h4>It works !</h4>
 	<br>
 </div>
 </body>
